@@ -5,6 +5,7 @@ import {login} from '../store/authSlice'
 import {Button, Input, Logo} from './index.js'
 import {useDispatch} from 'react-redux'
 import {useForm} from 'react-hook-form'
+import { compressImageIfNeeded } from "../utils/image.js"
 
 const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024
 const ALLOWED_AVATAR_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"]
@@ -12,11 +13,14 @@ const ALLOWED_AVATAR_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/gif
 function Signup() {
     const navigate = useNavigate()
     const [error, setError] = useState("")
+    const [info, setInfo] = useState("")
     const dispatch = useDispatch()
-    const {register, handleSubmit} = useForm()
+    const {register, handleSubmit, watch, formState: { errors }} = useForm()
+    const passwordValue = watch("password")
 
     const create = async(data) => {
         setError("")
+        setInfo("")
         try {
             const avatarFile = data.avatar && data.avatar[0] ? data.avatar[0] : null
             if (!avatarFile) {
@@ -27,9 +31,16 @@ function Signup() {
               setError("Only PNG, JPG, JPEG, GIF, or WEBP images are allowed.")
               return
             }
-            if (avatarFile.size > MAX_AVATAR_SIZE_BYTES) {
+            const processedAvatar = await compressImageIfNeeded(avatarFile, {
+              maxSizeBytes: MAX_AVATAR_SIZE_BYTES,
+            })
+
+            if (processedAvatar.size > MAX_AVATAR_SIZE_BYTES) {
               setError("Image too large. Maximum size is 2MB.")
               return
+            }
+            if (processedAvatar.size < avatarFile.size) {
+              setInfo("Image was optimized automatically for faster upload.")
             }
 
             const payload = {
@@ -39,7 +50,7 @@ function Signup() {
               phone: data.phone,
               dob: data.dob || "",
               description: data.description || "",
-              avatar: avatarFile,
+              avatar: processedAvatar,
             };
             const userData = await authService.createAccount(payload)
             if (userData) {
@@ -87,6 +98,7 @@ function Signup() {
               Sign in
             </Link>
           </p>
+          {info && <p className="mt-4 text-center text-sm text-emerald-700">{info}</p>}
           {error && <p className="mt-6 text-center text-sm text-red-600">{error}</p>}
 
           <form onSubmit={handleSubmit(create)} className="mt-8">
@@ -95,43 +107,64 @@ function Signup() {
                 label="Full name"
                 placeholder="Enter your full name"
                 {...register("name", {
-                  required: true,
+                  required: "Full name is required.",
                 })}
               />
+              {errors.name && <p className="text-xs text-red-600">{errors.name.message}</p>}
               <Input
                 label="Profile photo"
                 type="file"
                 accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
-                {...register("avatar", { required: true })}
+                {...register("avatar", { required: "Profile photo is required." })}
               />
+              {errors.avatar && <p className="text-xs text-red-600">{errors.avatar.message}</p>}
               <p className="text-xs text-slate-500">Use PNG/JPG/GIF/WEBP, up to 2MB.</p>
               <Input
                 label="Email"
                 placeholder="you@example.com"
                 type="email"
                 {...register("email", {
-                  required: true,
-                  validate: {
-                    matchPatern: (value) =>
-                      /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(value) ||
-                      "Email address must be a valid address",
-                  }
+                  required: "Email is required.",
+                  pattern: {
+                    value: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
+                    message: "Enter a valid email address.",
+                  },
                 })}
               />
+              {errors.email && <p className="text-xs text-red-600">{errors.email.message}</p>}
               <Input
                 label="Password"
                 type="password"
                 placeholder="Create a password"
                 {...register("password", {
-                  required: true,
+                  required: "Password is required.",
+                  minLength: {
+                    value: 6,
+                    message: "Password must be at least 6 characters.",
+                  },
                 })}
               />
+              {errors.password && <p className="text-xs text-red-600">{errors.password.message}</p>}
+              <Input
+                label="Confirm password"
+                type="password"
+                placeholder="Re-enter your password"
+                {...register("confirmPassword", {
+                  required: "Please confirm your password.",
+                  validate: (value) =>
+                    value === passwordValue || "Passwords do not match.",
+                })}
+              />
+              {errors.confirmPassword && (
+                <p className="text-xs text-red-600">{errors.confirmPassword.message}</p>
+              )}
               <Input
                 label="Phone number"
                 placeholder="e.g. +1 555 123 4567"
                 type="tel"
-                {...register("phone", { required: true })}
+                {...register("phone", { required: "Phone number is required." })}
               />
+              {errors.phone && <p className="text-xs text-red-600">{errors.phone.message}</p>}
               <Input
                 label="Date of birth (optional)"
                 type="date"

@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import authService from "../api/auth";
 import { updateUser } from "../store/authSlice";
 import { Button, Input } from "../components";
+import { compressImageIfNeeded } from "../utils/image";
 
 const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_AVATAR_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"];
@@ -37,8 +38,17 @@ function Profile() {
         return;
       }
       if (avatarFile && avatarFile.size > MAX_AVATAR_SIZE_BYTES) {
-        setError("Image too large. Maximum size is 2MB.");
-        return;
+        const compressed = await compressImageIfNeeded(avatarFile, {
+          maxSizeBytes: MAX_AVATAR_SIZE_BYTES,
+        });
+        if (compressed.size > MAX_AVATAR_SIZE_BYTES) {
+          setError("Image too large. Maximum size is 2MB.");
+          return;
+        }
+        if (compressed.size < avatarFile.size) {
+          setMessage("Profile image was optimized automatically before upload.");
+        }
+        data.avatar = [compressed];
       }
 
       const payload = {
@@ -47,7 +57,7 @@ function Profile() {
         phone: data.phone,
         dob: data.dob || "",
         description: data.description || "",
-        avatar: avatarFile,
+        avatar: data.avatar && data.avatar[0] ? data.avatar[0] : null,
       };
       const updated = await authService.updateProfile(payload);
       dispatch(updateUser({ userData: updated }));

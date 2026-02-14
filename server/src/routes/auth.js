@@ -56,6 +56,10 @@ function createEmailToken() {
   return crypto.randomBytes(32).toString("hex");
 }
 
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(email || "").trim().toLowerCase());
+}
+
 function resolvePublicClientOrigin(req) {
   const publicUrl =
     process.env.PUBLIC_APP_URL?.trim() ||
@@ -92,6 +96,9 @@ router.post("/signup", upload.single("avatar"), async (req, res) => {
 
     const normalizedEmail = String(email).trim().toLowerCase();
     const normalizedPhone = String(phone).trim();
+    if (!isValidEmail(normalizedEmail)) {
+      return res.status(400).json({ message: "Please enter a valid email address." });
+    }
 
     const existing = await User.findOne({
       $or: [{ email: normalizedEmail }, { phone: normalizedPhone }],
@@ -250,6 +257,9 @@ router.put("/me", authRequired, upload.single("avatar"), async (req, res) => {
 
     if (email !== undefined && String(email).trim().toLowerCase() !== user.email) {
       const normalizedEmail = String(email).trim().toLowerCase();
+      if (!isValidEmail(normalizedEmail)) {
+        return res.status(400).json({ message: "Please enter a valid email address." });
+      }
       const existingEmail = await User.findOne({ email: normalizedEmail, _id: { $ne: user._id } });
       if (existingEmail) return res.status(409).json({ message: "Email already in use." });
       user.email = normalizedEmail;

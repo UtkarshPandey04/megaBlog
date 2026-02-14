@@ -26,6 +26,9 @@ async function request(path, options = {}) {
     const res = await fetch(url, { ...options, headers });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
+        if (res.status === 413) {
+            throw new Error("Image too large for deployment limit. Please use an image up to 2MB.");
+        }
         const message = data?.message || "Request failed";
         throw new Error(message);
     }

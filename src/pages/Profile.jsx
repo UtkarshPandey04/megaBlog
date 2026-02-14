@@ -5,7 +5,7 @@ import authService from "../api/auth";
 import { updateUser } from "../store/authSlice";
 import { Button, Input } from "../components";
 
-const MAX_AVATAR_SIZE_BYTES = 4 * 1024 * 1024;
+const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_AVATAR_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"];
 
 function Profile() {
@@ -37,7 +37,7 @@ function Profile() {
         return;
       }
       if (avatarFile && avatarFile.size > MAX_AVATAR_SIZE_BYTES) {
-        setError("Image too large. Maximum size is 4MB.");
+        setError("Image too large. Maximum size is 2MB.");
         return;
       }
 
@@ -101,7 +101,7 @@ function Profile() {
           accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
           {...register("avatar")}
         />
-        <p className="text-xs text-slate-500">Use PNG/JPG/GIF/WEBP, up to 4MB.</p>
+        <p className="text-xs text-slate-500">Use PNG/JPG/GIF/WEBP, up to 2MB.</p>
         <Button type="submit" className="w-full">
           Save changes
         </Button>

@@ -9,7 +9,7 @@ import { uploadImageBuffer, deleteImage } from "../lib/cloudinary.js";
 import { sendEmailVerification } from "../lib/email.js";
 
 const router = express.Router();
-const MAX_AVATAR_SIZE_BYTES = 4 * 1024 * 1024;
+const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024;
 const ALLOWED_IMAGE_MIME_TYPES = new Set([
   "image/png",
   "image/jpeg",
@@ -351,7 +351,7 @@ router.delete("/bookmarks/:slug", authRequired, async (req, res) => {
 
 router.use((error, _req, res, next) => {
   if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
-    return res.status(413).json({ message: "Image too large. Maximum size is 4MB." });
+    return res.status(413).json({ message: "Image too large. Maximum size is 2MB." });
   }
 
   if (error?.message === "Only PNG, JPG, JPEG, GIF, or WEBP images are allowed.") {

@@ -6,7 +6,7 @@ import {Button, Input, Logo} from './index.js'
 import {useDispatch} from 'react-redux'
 import {useForm} from 'react-hook-form'
 
-const MAX_AVATAR_SIZE_BYTES = 4 * 1024 * 1024
+const MAX_AVATAR_SIZE_BYTES = 2 * 1024 * 1024
 const ALLOWED_AVATAR_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"]
 
 function Signup() {
@@ -28,7 +28,7 @@ function Signup() {
               return
             }
             if (avatarFile.size > MAX_AVATAR_SIZE_BYTES) {
-              setError("Image too large. Maximum size is 4MB.")
+              setError("Image too large. Maximum size is 2MB.")
               return
             }
 
@@ -104,7 +104,7 @@ function Signup() {
                 accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
                 {...register("avatar", { required: true })}
               />
-              <p className="text-xs text-slate-500">Use PNG/JPG/GIF/WEBP, up to 4MB.</p>
+              <p className="text-xs text-slate-500">Use PNG/JPG/GIF/WEBP, up to 2MB.</p>
               <Input
                 label="Email"
                 placeholder="you@example.com"

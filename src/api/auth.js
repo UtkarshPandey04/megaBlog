@@ -66,8 +66,13 @@ export class AuthService {
 
     async getCurrentUser() {
         try {
+            const token = getToken();
+            if (!token) return null;
             return await request("/api/auth/me");
         } catch (error) {
+            if (error.message === "Invalid token") {
+                clearToken();
+            }
             return null;
         }
     }

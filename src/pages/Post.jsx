@@ -187,7 +187,12 @@ export default function Post() {
               bgColor={post.likedByMe ? "bg-rose-500" : "bg-white"}
               textColor={post.likedByMe ? "text-white" : "text-slate-800"}
             >
-              {post.likedByMe ? "Liked" : "Like"} ({post.likesCount || 0})
+              <span className="inline-flex items-center gap-2">
+                <span className="text-base leading-none" aria-hidden="true">
+                  {post.likedByMe ? "♥" : "♡"}
+                </span>
+                <span>{post.likesCount || 0}</span>
+              </span>
             </Button>
           )}
           {userData && (

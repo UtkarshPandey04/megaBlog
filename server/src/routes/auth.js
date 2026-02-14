@@ -37,6 +37,29 @@ function createEmailToken() {
   return crypto.randomBytes(32).toString("hex");
 }
 
+function resolvePublicClientOrigin(req) {
+  const publicUrl =
+    process.env.PUBLIC_APP_URL?.trim() ||
+    process.env.APP_PUBLIC_URL?.trim() ||
+    process.env.FRONTEND_URL?.trim();
+  if (publicUrl) return publicUrl.replace(/\/+$/, "");
+
+  const configuredOrigin = (process.env.CLIENT_ORIGIN || "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean)[0];
+  if (configuredOrigin) return configuredOrigin.replace(/\/+$/, "");
+
+  const requestOrigin = String(req.get("origin") || "").trim();
+  if (requestOrigin) return requestOrigin.replace(/\/+$/, "");
+
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`.replace(/\/+$/, "");
+  }
+
+  return "http://localhost:5173";
+}
+
 router.post("/signup", upload.single("avatar"), async (req, res) => {
   try {
     const { name, email, password, phone, description, dob } = req.body;
@@ -84,7 +107,7 @@ router.post("/signup", upload.single("avatar"), async (req, res) => {
       emailVerificationExpires,
     });
 
-    const origin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+    const origin = resolvePublicClientOrigin(req);
     await sendEmailVerification({
       to: user.email,
       name: user.name,
@@ -176,7 +199,7 @@ router.post("/resend-email-verification", authRequired, async (req, res) => {
     user.emailVerificationExpires = new Date(Date.now() + 1000 * 60 * 60 * 24);
     await user.save();
 
-    const origin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+    const origin = resolvePublicClientOrigin(req);
     await sendEmailVerification({
       to: user.email,
       name: user.name,
@@ -237,7 +260,7 @@ router.put("/me", authRequired, upload.single("avatar"), async (req, res) => {
     await user.save();
 
     if (!user.isEmailVerified && user.emailVerificationToken) {
-      const origin = process.env.CLIENT_ORIGIN || "http://localhost:5173";
+      const origin = resolvePublicClientOrigin(req);
       await sendEmailVerification({
         to: user.email,
         name: user.name,

@@ -1,6 +1,6 @@
-import "dotenv/config";
 import path from "path";
 import { fileURLToPath } from "url";
+import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
@@ -10,6 +10,11 @@ import postRoutes from "./routes/posts.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Always load server env first, even when process starts from repo root.
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+// Fallback to root env for shared values if present.
+dotenv.config({ path: path.resolve(__dirname, "../../.env") });
 
 const app = express();
 

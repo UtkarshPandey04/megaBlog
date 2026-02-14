@@ -15,6 +15,7 @@ function Header() {
   const userData = useSelector((state) => state.auth.userData)
   const navigate = useNavigate()
   const [theme, setTheme] = useState(getInitialTheme)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const isDark = theme === 'dark'
@@ -64,20 +65,44 @@ function Header() {
   return (
     <header className='sticky top-0 z-40 border-b border-slate-900/10 bg-white/70 backdrop-blur'>
       <Container>
-        <nav className='flex flex-col gap-4 py-4 sm:flex-row sm:items-center'>
-          <div className='flex items-center justify-between'>
+        <nav className='py-3 sm:py-4'>
+          <div className='flex items-center justify-between gap-3'>
             <Link to='/' className='inline-flex items-center gap-3'>
-              <Logo width='70px' />
-              <span className='text-lg font-semibold tracking-tight text-slate-900'>MegaBlog</span>
+              <Logo width='58px' />
+              <span className='text-base font-semibold tracking-tight text-slate-900 sm:text-lg'>MegaBlog</span>
             </Link>
+            <div className='flex items-center gap-2'>
+              <button
+                onClick={() => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
+                className='theme-toggle inline-flex items-center gap-2 rounded-full px-2 py-1.5 text-xs font-semibold transition'
+                aria-label='Toggle theme'
+              >
+                <span className='theme-toggle__track'>
+                  <span className={`theme-toggle__thumb ${theme === 'dark' ? 'is-dark' : ''}`} />
+                </span>
+                <span className='theme-toggle__label hidden sm:inline'>{theme === 'dark' ? 'Light' : 'Dark'}</span>
+              </button>
+              <button
+                type='button'
+                onClick={() => setMenuOpen((prev) => !prev)}
+                className='inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-900/10 bg-white text-slate-700 shadow-sm sm:hidden'
+                aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+                aria-expanded={menuOpen}
+              >
+                <span className='text-lg leading-none'>{menuOpen ? 'X' : '='}</span>
+              </button>
+            </div>
           </div>
-          <ul className='flex flex-wrap items-center gap-2 sm:ml-auto sm:justify-end'>
+          <ul className={`${menuOpen ? 'mt-3 grid' : 'hidden'} gap-2 sm:mt-4 sm:flex sm:flex-wrap sm:items-center sm:justify-end`}>
             {navItems.map((item) =>
               item.active ? (
                 <li key={item.name}>
                   <button
-                    onClick={() => navigate(item.slug)}
-                    className='inline-flex items-center rounded-full border border-slate-900/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-900/20 hover:text-slate-900 hover:shadow'
+                    onClick={() => {
+                      setMenuOpen(false)
+                      navigate(item.slug)
+                    }}
+                    className='inline-flex w-full items-center justify-center rounded-full border border-slate-900/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-900/20 hover:text-slate-900 hover:shadow sm:w-auto'
                   >
                     {item.name}
                   </button>
@@ -85,7 +110,7 @@ function Header() {
               ) : null
             )}
             {authStatus && userData && (
-              <li className='flex items-center gap-2 rounded-full border border-slate-900/10 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm'>
+              <li className='flex w-full items-center gap-2 rounded-full border border-slate-900/10 bg-white px-3 py-2 text-xs font-medium text-slate-700 shadow-sm sm:w-auto'>
                 <div className='h-8 w-8 overflow-hidden rounded-full bg-slate-200'>
                   {userData.avatarUrl ? (
                     <img
@@ -99,8 +124,8 @@ function Header() {
                     </div>
                   )}
                 </div>
-                <div className='flex flex-col leading-tight'>
-                  <span className='text-sm font-semibold text-slate-900'>{userData.name}</span>
+                <div className='min-w-0 flex flex-col leading-tight'>
+                  <span className='truncate text-sm font-semibold text-slate-900'>{userData.name}</span>
                   <span className='text-[10px] text-slate-500'>
                     {userData.isEmailVerified ? "Email verified" : "Email unverified"}
                   </span>
@@ -112,18 +137,6 @@ function Header() {
                 <LogoutBtn />
               </li>
             )}
-            <li>
-              <button
-                onClick={() => setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'))}
-                className='theme-toggle inline-flex items-center gap-2 rounded-full px-2 py-1.5 text-xs font-semibold transition'
-                aria-label='Toggle theme'
-              >
-                <span className='theme-toggle__track'>
-                  <span className={`theme-toggle__thumb ${theme === 'dark' ? 'is-dark' : ''}`} />
-                </span>
-                <span className='theme-toggle__label'>{theme === 'dark' ? 'Light' : 'Dark'}</span>
-              </button>
-            </li>
           </ul>
         </nav>
       </Container>

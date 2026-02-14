@@ -30,7 +30,7 @@ export default function Protected({children, authentication = true}) {
   if (loader) {
     return (
       <div className='grid min-h-[70vh] place-items-center'>
-        <div className='flex flex-col items-center gap-4 rounded-3xl border border-slate-900/10 bg-white/80 px-10 py-8 shadow-sm backdrop-blur'>
+        <div className='flex flex-col items-center gap-4 rounded-3xl border border-slate-900/10 bg-white/80 px-6 py-8 shadow-sm backdrop-blur sm:px-10'>
           <span className='h-10 w-10 animate-spin rounded-full border-4 border-slate-900/10 border-t-slate-900' />
           <p className='text-sm font-medium text-slate-600'>Checking your session...</p>
         </div>

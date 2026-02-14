@@ -4,9 +4,9 @@ import Logo from '../Logo'
 
 function Footer() {
   return (
-    <section className="relative overflow-hidden border-t border-slate-900/10 bg-white/70 py-12 backdrop-blur">
+    <section className="relative overflow-hidden border-t border-slate-900/10 bg-white/70 py-10 backdrop-blur sm:py-12">
       <div className="relative z-10 mx-auto max-w-7xl px-4">
-        <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-[2fr,1fr,1fr,1fr]">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-[2fr,1fr,1fr,1fr]">
           <div className="flex flex-col gap-4">
             <div className="inline-flex items-center gap-3">
               <Logo width="100px" />

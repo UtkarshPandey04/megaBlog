@@ -163,11 +163,11 @@ export default function Post() {
             </Button>
           )}
           {isAuthor && (
-            <div className="ml-auto flex items-center gap-2">
-              <Link to={`/edit-post/${post.$id}`}>
-                <Button bgColor="bg-green-500">Edit</Button>
+            <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
+              <Link to={`/edit-post/${post.$id}`} className="w-full sm:w-auto">
+                <Button bgColor="bg-green-500" className="w-full sm:w-auto">Edit</Button>
               </Link>
-              <Button bgColor="bg-red-500" onClick={deletePost}>
+              <Button bgColor="bg-red-500" onClick={deletePost} className="w-full sm:w-auto">
                 Delete
               </Button>
             </div>
@@ -178,7 +178,7 @@ export default function Post() {
           <div className="browser-css">{parse(post.content)}</div>
         </section>
 
-        <section className="motion-fade-up motion-delay-3 mt-10 rounded-3xl border border-slate-900/10 bg-white/80 p-6 shadow-sm backdrop-blur">
+        <section className="motion-fade-up motion-delay-3 mt-10 rounded-3xl border border-slate-900/10 bg-white/80 p-4 shadow-sm backdrop-blur sm:p-6">
           <h3 className="text-lg font-semibold text-slate-900">Comments</h3>
           {userData ? (
             <div className="mt-4">

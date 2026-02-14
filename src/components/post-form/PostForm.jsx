@@ -120,13 +120,13 @@ export default function PostForm({ post }) {
     return (
         <form onSubmit={handleSubmit(submit)} className="flex flex-wrap">
             {formError && (
-                <div className="w-full px-2 pb-4">
+                <div className="w-full pb-4 sm:px-2">
                     <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
                         {formError}
                     </div>
                 </div>
             )}
-            <div className="w-2/3 px-2">
+            <div className="w-full sm:px-2 lg:w-2/3">
                 <Input
                     label="Title :"
                     placeholder="Title"
@@ -144,7 +144,7 @@ export default function PostForm({ post }) {
                 />
                 <RTE label="Content :" name="content" control={control} defaultValue={getValues("content")} />
             </div>
-            <div className="w-1/3 px-2">
+            <div className="mt-4 w-full sm:px-2 lg:mt-0 lg:w-1/3">
                 <Input
                     label="Category :"
                     placeholder="e.g. Engineering"
@@ -166,11 +166,11 @@ export default function PostForm({ post }) {
                     {...register("image", { required: !post })}
                 />
                 {post && (
-                    <div className="w-full mb-4">
+                    <div className="mb-4 w-full">
                         <img
                             src={postsService.getFilePreview(post.featuredImage)}
                             alt={post.title}
-                            className="rounded-lg"
+                            className="w-full rounded-lg object-cover"
                         />
                     </div>
                 )}

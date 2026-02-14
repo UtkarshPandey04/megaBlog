@@ -23,7 +23,7 @@ function AllPosts() {
             .catch((err) => setError(err.message || "Failed to load posts"))
     }, [page, query, category, tag])
   return (
-    <div className='w-full py-8'>
+    <div className='w-full py-6 sm:py-8'>
         <Container>
             {error && (
                 <div className='motion-fade-in mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700'>
@@ -67,22 +67,22 @@ function AllPosts() {
                 ))}
             </div>
             {totalPages > 1 && (
-                <div className='mt-8 flex items-center justify-center gap-3'>
+                <div className='mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:items-center'>
                     <button
                         type='button'
                         onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                        className='rounded-full border border-slate-900/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-900/20 hover:text-slate-900 hover:shadow'
+                        className='rounded-full border border-slate-900/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-900/20 hover:text-slate-900 hover:shadow sm:min-w-[110px]'
                         disabled={page === 1}
                     >
                         Previous
                     </button>
-                    <span className='text-sm text-slate-600'>
+                    <span className='text-center text-sm text-slate-600'>
                         Page {page} of {totalPages}
                     </span>
                     <button
                         type='button'
                         onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-                        className='rounded-full border border-slate-900/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-900/20 hover:text-slate-900 hover:shadow'
+                        className='rounded-full border border-slate-900/10 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-900/20 hover:text-slate-900 hover:shadow sm:min-w-[110px]'
                         disabled={page === totalPages}
                     >
                         Next

@@ -2,6 +2,7 @@ import express from "express";
 import multer from "multer";
 import path from "path";
 import { fileURLToPath } from "url";
+import jwt from "jsonwebtoken";
 import Post from "../models/Post.js";
 import Comment from "../models/Comment.js";
 import { authRequired } from "../middleware/auth.js";
@@ -13,6 +14,41 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const upload = multer({ storage: multer.memoryStorage() });
+
+function getOptionalUserId(req) {
+  const authHeader = req.headers.authorization || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!token) return null;
+
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET || "dev_secret");
+    return payload?.id || null;
+  } catch {
+    return null;
+  }
+}
+
+function serializePost(post, currentUserId = null) {
+  const likes = Array.isArray(post.likes) ? post.likes : [];
+  const likedByMe = currentUserId
+    ? likes.some((id) => id.toString() === currentUserId)
+    : false;
+
+  return {
+    $id: post.slug,
+    title: post.title,
+    slug: post.slug,
+    content: post.content,
+    featuredImage: post.featuredImage,
+    category: post.category,
+    tags: post.tags,
+    status: post.status,
+    views: post.views,
+    likesCount: likes.length,
+    likedByMe,
+    userId: post.userId.toString(),
+  };
+}
 
 router.get("/", async (req, res) => {
   try {
@@ -30,6 +66,7 @@ router.get("/", async (req, res) => {
     if (q) filter.$text = { $search: q };
     const page = Math.max(parseInt(req.query.page || "1", 10), 1);
     const limit = Math.max(parseInt(req.query.limit || "8", 10), 1);
+    const currentUserId = getOptionalUserId(req);
 
     const total = await Post.countDocuments(filter);
     const posts = await Post.find(filter)
@@ -37,18 +74,7 @@ router.get("/", async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const items = posts.map((post) => ({
-      $id: post.slug,
-      title: post.title,
-      slug: post.slug,
-      content: post.content,
-      featuredImage: post.featuredImage,
-      category: post.category,
-      tags: post.tags,
-      status: post.status,
-      views: post.views,
-      userId: post.userId.toString(),
-    }));
+    const items = posts.map((post) => serializePost(post, currentUserId));
 
     return res.json({
       items,
@@ -64,24 +90,14 @@ router.get("/", async (req, res) => {
 
 router.get("/:slug", async (req, res) => {
   try {
+    const currentUserId = getOptionalUserId(req);
     const post = await Post.findOne({ slug: req.params.slug });
     if (!post) {
       return res.status(404).json({ message: "Post not found." });
     }
     post.views += 1;
     await post.save();
-    return res.json({
-      $id: post.slug,
-      title: post.title,
-      slug: post.slug,
-      content: post.content,
-      featuredImage: post.featuredImage,
-      category: post.category,
-      tags: post.tags,
-      status: post.status,
-      views: post.views,
-      userId: post.userId.toString(),
-    });
+    return res.json(serializePost(post, currentUserId));
   } catch (error) {
     return res.status(500).json({ message: "Failed to fetch post." });
   }
@@ -122,18 +138,7 @@ router.post("/", authRequired, upload.single("image"), async (req, res) => {
       userId: req.user.id,
     });
 
-    return res.json({
-      $id: post.slug,
-      title: post.title,
-      slug: post.slug,
-      content: post.content,
-      featuredImage: post.featuredImage,
-      category: post.category,
-      tags: post.tags,
-      status: post.status,
-      views: post.views,
-      userId: post.userId.toString(),
-    });
+    return res.json(serializePost(post, req.user.id));
   } catch (error) {
     return res.status(500).json({ message: "Failed to create post." });
   }
@@ -170,18 +175,7 @@ router.put("/:slug", authRequired, upload.single("image"), async (req, res) => {
     }
 
     await post.save();
-    return res.json({
-      $id: post.slug,
-      title: post.title,
-      slug: post.slug,
-      content: post.content,
-      featuredImage: post.featuredImage,
-      category: post.category,
-      tags: post.tags,
-      status: post.status,
-      views: post.views,
-      userId: post.userId.toString(),
-    });
+    return res.json(serializePost(post, req.user.id));
   } catch (error) {
     return res.status(500).json({ message: "Failed to update post." });
   }
@@ -264,6 +258,43 @@ router.delete("/:slug/comments/:commentId", authRequired, async (req, res) => {
     return res.json({ success: true });
   } catch (error) {
     return res.status(500).json({ message: "Failed to delete comment." });
+  }
+});
+
+router.post("/:slug/likes", authRequired, async (req, res) => {
+  try {
+    const post = await Post.findOne({ slug: req.params.slug });
+    if (!post) return res.status(404).json({ message: "Post not found." });
+
+    const alreadyLiked = post.likes.some((id) => id.toString() === req.user.id);
+    if (!alreadyLiked) {
+      post.likes.push(req.user.id);
+      await post.save();
+    }
+
+    return res.json({
+      likesCount: post.likes.length,
+      likedByMe: true,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to like post." });
+  }
+});
+
+router.delete("/:slug/likes", authRequired, async (req, res) => {
+  try {
+    const post = await Post.findOne({ slug: req.params.slug });
+    if (!post) return res.status(404).json({ message: "Post not found." });
+
+    post.likes = post.likes.filter((id) => id.toString() !== req.user.id);
+    await post.save();
+
+    return res.json({
+      likesCount: post.likes.length,
+      likedByMe: false,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to unlike post." });
   }
 });
 

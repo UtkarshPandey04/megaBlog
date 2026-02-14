@@ -118,6 +118,14 @@ export class PostsService {
     async deleteComment(slug, commentId) {
         return await request(`/api/posts/${slug}/comments/${commentId}`, { method: "DELETE" });
     }
+
+    async likePost(slug) {
+        return await request(`/api/posts/${slug}/likes`, { method: "POST" });
+    }
+
+    async unlikePost(slug) {
+        return await request(`/api/posts/${slug}/likes`, { method: "DELETE" });
+    }
 }
 
 const postsService = new PostsService();

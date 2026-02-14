@@ -45,7 +45,9 @@ function Signup() {
             if (userData) {
                 const userData = await authService.getCurrentUser()
                 if (userData) dispatch(login({ userData }));
-                navigate("/profile")
+                navigate("/verify-email-pending", {
+                  state: { email: userData?.email || payload.email },
+                })
             }
         } catch (error) {
             setError(error.message)

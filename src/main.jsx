@@ -20,6 +20,7 @@ import Author from "./pages/Author";
 import Bookmarks from "./pages/Bookmarks";
 import Profile from "./pages/Profile";
 import VerifyEmail from "./pages/VerifyEmail";
+import VerifyEmailPending from "./pages/VerifyEmailPending";
 
 const savedTheme = localStorage.getItem('megablog-theme')
 const preferredDark = window.matchMedia('(prefers-color-scheme: dark)').matches
@@ -103,6 +104,15 @@ const router = createBrowserRouter([
         {
             path: "/verify-email",
             element: <VerifyEmail />,
+        },
+        {
+            path: "/verify-email-pending",
+            element: (
+                <AuthLayout authentication>
+                    {" "}
+                    <VerifyEmailPending />
+                </AuthLayout>
+            ),
         },
         {
             path: "/post/:slug",

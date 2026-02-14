@@ -57,17 +57,6 @@ function Profile() {
     }
   };
 
-  const handleResendEmail = async () => {
-    setError("");
-    setMessage("");
-    try {
-      await authService.resendEmailVerification();
-      setMessage("Verification email sent.");
-    } catch (err) {
-      setError(err.message || "Failed to resend verification email.");
-    }
-  };
-
   if (!userData) {
     return (
       <div className="grid min-h-[60vh] place-items-center text-sm text-slate-600">
@@ -79,9 +68,7 @@ function Profile() {
   return (
     <div className="mx-auto w-full max-w-3xl rounded-[32px] border border-slate-900/10 bg-white/80 p-6 shadow-lg backdrop-blur sm:p-10">
       <h1 className="text-2xl font-semibold text-slate-900">Your Profile</h1>
-      <p className="mt-2 text-sm text-slate-600">
-        Update your details and complete verification.
-      </p>
+      <p className="mt-2 text-sm text-slate-600">Update your details.</p>
 
       {message && <p className="mt-4 text-sm text-emerald-700">{message}</p>}
       {error && <p className="mt-4 text-sm text-red-600">{error}</p>}
@@ -100,12 +87,6 @@ function Profile() {
             </span>
           </p>
         </div>
-      </div>
-
-      <div className="mt-6">
-        <Button type="button" onClick={handleResendEmail} className="w-full">
-          Resend Email Verification
-        </Button>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-8 grid gap-5">

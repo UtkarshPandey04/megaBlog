@@ -13,6 +13,7 @@ export default function Post() {
   const [commentText, setCommentText] = useState("");
   const [commentError, setCommentError] = useState("");
   const [bookmarking, setBookmarking] = useState(false);
+  const [liking, setLiking] = useState(false);
   const { slug } = useParams();
   const navigate = useNavigate();
 
@@ -97,6 +98,30 @@ export default function Post() {
     }
   };
 
+  const toggleLike = async () => {
+    if (!userData) return;
+    if (!post) return;
+
+    setLiking(true);
+    try {
+      const response = post.likedByMe
+        ? await postsService.unlikePost(post.$id)
+        : await postsService.likePost(post.$id);
+
+      setPost((prev) =>
+        prev
+          ? {
+              ...prev,
+              likesCount: response.likesCount,
+              likedByMe: response.likedByMe,
+            }
+          : prev
+      );
+    } finally {
+      setLiking(false);
+    }
+  };
+
   if (!post) return null;
 
   return (
@@ -139,6 +164,8 @@ export default function Post() {
                 <span>{readingTime} min read</span>
                 <span className="h-1 w-1 rounded-full bg-slate-200" />
                 <span>{post.views} views</span>
+                <span className="h-1 w-1 rounded-full bg-slate-200" />
+                <span>{post.likesCount || 0} likes</span>
               </div>
             </div>
           </div>
@@ -151,6 +178,18 @@ export default function Post() {
           >
             View author
           </Link>
+          {userData && (
+            <Button
+              type="button"
+              className="text-xs"
+              onClick={toggleLike}
+              disabled={liking}
+              bgColor={post.likedByMe ? "bg-rose-500" : "bg-white"}
+              textColor={post.likedByMe ? "text-white" : "text-slate-800"}
+            >
+              {post.likedByMe ? "Liked" : "Like"} ({post.likesCount || 0})
+            </Button>
+          )}
           {userData && (
             <Button
               type="button"

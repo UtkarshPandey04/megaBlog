@@ -2,7 +2,7 @@ import React from 'react'
 import postsService from "../api/posts"
 import {Link} from 'react-router-dom'
 
-function PostCard({$id, title, featuredImage, category, tags}) {
+function PostCard({$id, title, featuredImage, category, tags, likesCount}) {
   return (
     <Link to={`/post/${$id}`}>
       <article className='group motion-fade-up surface-glass flex h-full flex-col overflow-hidden rounded-3xl transition duration-300 hover:-translate-y-1.5 hover:border-slate-900/20 hover:shadow-xl'>
@@ -33,6 +33,7 @@ function PostCard({$id, title, featuredImage, category, tags}) {
           </p>
           <span className='mt-auto inline-flex items-center gap-2 text-sm font-semibold text-slate-900'>
             Read article
+            <span className='text-xs font-medium text-slate-500'>({likesCount || 0} likes)</span>
             <span className='transition group-hover:translate-x-1' aria-hidden='true'>
               {">"}
             </span>

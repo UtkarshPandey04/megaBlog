@@ -113,6 +113,16 @@ export class AuthService {
         return await request(`/api/auth/author/${id}`);
     }
 
+    async getAuthors({ q = "", page = 1, limit = 12 } = {}) {
+        const params = new URLSearchParams();
+        if (q) params.set("q", q);
+        if (page) params.set("page", String(page));
+        if (limit) params.set("limit", String(limit));
+
+        const data = await request(`/api/auth/authors?${params.toString()}`);
+        return { documents: data.items || [], meta: data };
+    }
+
     async getBookmarks() {
         return await request("/api/auth/bookmarks");
     }

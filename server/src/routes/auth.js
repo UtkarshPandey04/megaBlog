@@ -321,6 +321,47 @@ router.get("/author/:id", async (req, res) => {
   }
 });
 
+router.get("/authors", async (req, res) => {
+  try {
+    const q = String(req.query.q || "").trim();
+    const page = Math.max(parseInt(req.query.page || "1", 10), 1);
+    const limit = Math.max(parseInt(req.query.limit || "12", 10), 1);
+
+    const filter = q
+      ? {
+          $or: [
+            { name: { $regex: q, $options: "i" } },
+            { email: { $regex: q, $options: "i" } },
+            { description: { $regex: q, $options: "i" } },
+          ],
+        }
+      : {};
+
+    const total = await User.countDocuments(filter);
+    const users = await User.find(filter)
+      .select("name email avatarUrl description")
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(limit);
+
+    return res.json({
+      items: users.map((user) => ({
+        $id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        avatarUrl: user.avatarUrl,
+        description: user.description || "",
+      })),
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit) || 1,
+    });
+  } catch (error) {
+    return res.status(500).json({ message: "Failed to fetch authors." });
+  }
+});
+
 router.get("/bookmarks", authRequired, async (req, res) => {
   try {
     const user = await User.findById(req.user.id);

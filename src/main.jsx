@@ -17,6 +17,7 @@ import Post from "./pages/Post";
 
 import AllPosts from "./pages/AllPosts";
 import Author from "./pages/Author";
+import Authors from "./pages/Authors";
 import Bookmarks from "./pages/Bookmarks";
 import Profile from "./pages/Profile";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -82,6 +83,10 @@ const router = createBrowserRouter([
         {
             path: "/author/:id",
             element: <Author />,
+        },
+        {
+            path: "/authors",
+            element: <Authors />,
         },
         {
             path: "/edit-post/:slug",

@@ -35,8 +35,20 @@ export default function Author() {
         {author && (
           <div className="mb-8 rounded-3xl border border-slate-900/10 bg-white/80 p-6 shadow-sm">
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500">Author Profile</p>
-            <h1 className="mt-2 text-3xl font-semibold text-slate-900">{author.name}</h1>
-            <p className="mt-2 text-sm text-slate-600">{author.email}</p>
+            <div className="mt-4 flex items-center gap-4">
+              <div className="h-16 w-16 overflow-hidden rounded-full bg-slate-200">
+                {author.avatarUrl ? (
+                  <img src={author.avatarUrl} alt={author.name} className="h-full w-full object-cover" />
+                ) : null}
+              </div>
+              <div>
+                <h1 className="text-3xl font-semibold text-slate-900">{author.name}</h1>
+                <p className="mt-1 text-sm text-slate-600">{author.email}</p>
+              </div>
+            </div>
+            <p className="mt-4 text-sm text-slate-700">
+              {author.description || "This author has not added a short bio yet."}
+            </p>
             <p className="mt-3 text-sm text-slate-600">
               Explore posts, open any post to like and comment, then continue publishing your own stories.
             </p>

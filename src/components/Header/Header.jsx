@@ -16,12 +16,55 @@ function Header() {
   const navigate = useNavigate()
   const [theme, setTheme] = useState(getInitialTheme)
   const [menuOpen, setMenuOpen] = useState(false)
+  const [typeText, setTypeText] = useState("")
+  const [typeWordIndex, setTypeWordIndex] = useState(0)
+  const [typeCharIndex, setTypeCharIndex] = useState(0)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const typeWords = ["Thoughts.", "Sharing.", "Community."]
 
   useEffect(() => {
     const isDark = theme === 'dark'
     document.documentElement.classList.toggle('dark', isDark)
     localStorage.setItem('megablog-theme', theme)
   }, [theme])
+
+  useEffect(() => {
+    const currentWord = typeWords[typeWordIndex]
+    let delay = isDeleting ? 55 : 95
+
+    if (!isDeleting && typeCharIndex < currentWord.length) {
+      const timeout = setTimeout(() => {
+        const nextIndex = typeCharIndex + 1
+        setTypeText(currentWord.slice(0, nextIndex))
+        setTypeCharIndex(nextIndex)
+      }, delay)
+      return () => clearTimeout(timeout)
+    }
+
+    if (!isDeleting && typeCharIndex === currentWord.length) {
+      const timeout = setTimeout(() => {
+        setIsDeleting(true)
+      }, 900)
+      return () => clearTimeout(timeout)
+    }
+
+    if (isDeleting && typeCharIndex > 0) {
+      const timeout = setTimeout(() => {
+        const nextIndex = typeCharIndex - 1
+        setTypeText(currentWord.slice(0, nextIndex))
+        setTypeCharIndex(nextIndex)
+      }, delay)
+      return () => clearTimeout(timeout)
+    }
+
+    const timeout = setTimeout(() => {
+      setIsDeleting(false)
+      setTypeWordIndex((prev) => (prev + 1) % typeWords.length)
+      setTypeCharIndex(0)
+      setTypeText("")
+    }, 220)
+    return () => clearTimeout(timeout)
+  }, [isDeleting, typeCharIndex, typeWordIndex])
 
   const navItems = [
     {
@@ -74,7 +117,12 @@ function Header() {
           <div className='flex items-center justify-between gap-3'>
             <Link to='/' className='inline-flex items-center gap-2.5 rounded-full px-1 py-1 sm:gap-3'>
               <Logo width='58px' />
-              <span className='text-base font-semibold tracking-tight text-slate-900 sm:text-lg'>MegaBlog</span>
+              <span className='flex flex-col leading-tight'>
+                <span className='text-base font-semibold tracking-tight text-slate-900 sm:text-lg'>MegaBlog</span>
+                <span className='typewriter-tagline text-[11px] font-medium text-slate-500 sm:text-xs'>
+                  {typeText}
+                </span>
+              </span>
             </Link>
             <div className='flex items-center gap-2'>
               <button

@@ -16,12 +16,36 @@ const app = express();
 const fallbackOrigin = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:5173";
-const clientOrigin = process.env.CLIENT_ORIGIN || fallbackOrigin;
+const configuredOrigins = (process.env.CLIENT_ORIGIN || fallbackOrigin)
+  .split(",")
+  .map((value) => value.trim())
+  .filter(Boolean);
+
+function isAllowedOrigin(origin) {
+  if (!origin) return true;
+
+  if (configuredOrigins.includes(origin)) {
+    return true;
+  }
+
+  try {
+    const { hostname } = new URL(origin);
+
+    // Allow Vercel preview and production domains for this app.
+    if (hostname.endsWith(".vercel.app")) {
+      return true;
+    }
+
+    return false;
+  } catch {
+    return false;
+  }
+}
 
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || origin === clientOrigin) {
+      if (isAllowedOrigin(origin)) {
         return callback(null, true);
       }
       return callback(new Error("Not allowed by CORS"));

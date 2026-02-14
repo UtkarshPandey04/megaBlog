@@ -6,6 +6,9 @@ import {Button, Input, Logo} from './index.js'
 import {useDispatch} from 'react-redux'
 import {useForm} from 'react-hook-form'
 
+const MAX_AVATAR_SIZE_BYTES = 4 * 1024 * 1024
+const ALLOWED_AVATAR_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"]
+
 function Signup() {
     const navigate = useNavigate()
     const [error, setError] = useState("")
@@ -15,6 +18,20 @@ function Signup() {
     const create = async(data) => {
         setError("")
         try {
+            const avatarFile = data.avatar && data.avatar[0] ? data.avatar[0] : null
+            if (!avatarFile) {
+              setError("Profile photo is required.")
+              return
+            }
+            if (!ALLOWED_AVATAR_TYPES.includes(avatarFile.type)) {
+              setError("Only PNG, JPG, JPEG, GIF, or WEBP images are allowed.")
+              return
+            }
+            if (avatarFile.size > MAX_AVATAR_SIZE_BYTES) {
+              setError("Image too large. Maximum size is 4MB.")
+              return
+            }
+
             const payload = {
               name: data.name,
               email: data.email,
@@ -22,7 +39,7 @@ function Signup() {
               phone: data.phone,
               dob: data.dob || "",
               description: data.description || "",
-              avatar: data.avatar && data.avatar[0] ? data.avatar[0] : null,
+              avatar: avatarFile,
             };
             const userData = await authService.createAccount(payload)
             if (userData) {
@@ -82,9 +99,10 @@ function Signup() {
               <Input
                 label="Profile photo"
                 type="file"
-                accept="image/png, image/jpg, image/jpeg, image/gif"
+                accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
                 {...register("avatar", { required: true })}
               />
+              <p className="text-xs text-slate-500">Use PNG/JPG/GIF/WEBP, up to 4MB.</p>
               <Input
                 label="Email"
                 placeholder="you@example.com"

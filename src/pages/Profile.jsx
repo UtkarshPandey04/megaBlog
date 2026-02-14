@@ -5,6 +5,9 @@ import authService from "../api/auth";
 import { updateUser } from "../store/authSlice";
 import { Button, Input } from "../components";
 
+const MAX_AVATAR_SIZE_BYTES = 4 * 1024 * 1024;
+const ALLOWED_AVATAR_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/gif", "image/webp"];
+
 function Profile() {
   const userData = useSelector((state) => state.auth.userData);
   const dispatch = useDispatch();
@@ -28,13 +31,23 @@ function Profile() {
     setError("");
     setMessage("");
     try {
+      const avatarFile = data.avatar && data.avatar[0] ? data.avatar[0] : null;
+      if (avatarFile && !ALLOWED_AVATAR_TYPES.includes(avatarFile.type)) {
+        setError("Only PNG, JPG, JPEG, GIF, or WEBP images are allowed.");
+        return;
+      }
+      if (avatarFile && avatarFile.size > MAX_AVATAR_SIZE_BYTES) {
+        setError("Image too large. Maximum size is 4MB.");
+        return;
+      }
+
       const payload = {
         name: data.name,
         email: data.email,
         phone: data.phone,
         dob: data.dob || "",
         description: data.description || "",
-        avatar: data.avatar && data.avatar[0] ? data.avatar[0] : null,
+        avatar: avatarFile,
       };
       const updated = await authService.updateProfile(payload);
       dispatch(updateUser({ userData: updated }));
@@ -104,9 +117,10 @@ function Profile() {
         <Input
           label="Update profile photo"
           type="file"
-          accept="image/png, image/jpg, image/jpeg, image/gif"
+          accept="image/png, image/jpg, image/jpeg, image/gif, image/webp"
           {...register("avatar")}
         />
+        <p className="text-xs text-slate-500">Use PNG/JPG/GIF/WEBP, up to 4MB.</p>
         <Button type="submit" className="w-full">
           Save changes
         </Button>

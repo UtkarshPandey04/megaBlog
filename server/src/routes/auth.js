@@ -9,7 +9,26 @@ import { uploadImageBuffer, deleteImage } from "../lib/cloudinary.js";
 import { sendEmailVerification } from "../lib/email.js";
 
 const router = express.Router();
-const upload = multer({ storage: multer.memoryStorage() });
+const MAX_AVATAR_SIZE_BYTES = 4 * 1024 * 1024;
+const ALLOWED_IMAGE_MIME_TYPES = new Set([
+  "image/png",
+  "image/jpeg",
+  "image/jpg",
+  "image/gif",
+  "image/webp",
+]);
+
+const upload = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: MAX_AVATAR_SIZE_BYTES },
+  fileFilter: (_req, file, cb) => {
+    if (!file?.mimetype || !ALLOWED_IMAGE_MIME_TYPES.has(file.mimetype)) {
+      cb(new Error("Only PNG, JPG, JPEG, GIF, or WEBP images are allowed."));
+      return;
+    }
+    cb(null, true);
+  },
+});
 
 function signToken(user) {
   return jwt.sign(
@@ -328,6 +347,18 @@ router.delete("/bookmarks/:slug", authRequired, async (req, res) => {
   } catch (error) {
     return res.status(500).json({ message: "Failed to update bookmarks." });
   }
+});
+
+router.use((error, _req, res, next) => {
+  if (error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE") {
+    return res.status(413).json({ message: "Image too large. Maximum size is 4MB." });
+  }
+
+  if (error?.message === "Only PNG, JPG, JPEG, GIF, or WEBP images are allowed.") {
+    return res.status(400).json({ message: error.message });
+  }
+
+  return next(error);
 });
 
 export default router;

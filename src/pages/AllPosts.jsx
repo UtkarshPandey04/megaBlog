@@ -30,34 +30,39 @@ function AllPosts() {
                     {error}
                 </div>
             )}
-            <div className='motion-fade-up mb-6 grid gap-3 md:grid-cols-[1.6fr,1fr,1fr]'>
-                <input
-                    className='w-full rounded-2xl border border-slate-900/10 bg-white/90 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900/30 focus:bg-white focus:ring-2 focus:ring-amber-200'
-                    placeholder='Search posts...'
-                    value={query}
-                    onChange={(e) => {
-                        setPage(1);
-                        setQuery(e.target.value);
-                    }}
-                />
-                <input
-                    className='w-full rounded-2xl border border-slate-900/10 bg-white/90 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900/30 focus:bg-white focus:ring-2 focus:ring-amber-200'
-                    placeholder='Filter by category'
-                    value={category}
-                    onChange={(e) => {
-                        setPage(1);
-                        setCategory(e.target.value);
-                    }}
-                />
-                <input
-                    className='w-full rounded-2xl border border-slate-900/10 bg-white/90 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900/30 focus:bg-white focus:ring-2 focus:ring-amber-200'
-                    placeholder='Filter by tag'
-                    value={tag}
-                    onChange={(e) => {
-                        setPage(1);
-                        setTag(e.target.value);
-                    }}
-                />
+            <div className='motion-fade-up mb-6'>
+                <div className='surface-glass rounded-3xl p-3 sm:p-4'>
+                    <p className='section-kicker mb-3'>Explore Posts</p>
+                    <div className='grid gap-3 md:grid-cols-[1.6fr,1fr,1fr]'>
+                        <input
+                            className='w-full rounded-2xl border border-slate-900/10 bg-white/90 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900/30 focus:bg-white focus:ring-2 focus:ring-amber-200'
+                            placeholder='Search posts...'
+                            value={query}
+                            onChange={(e) => {
+                                setPage(1);
+                                setQuery(e.target.value);
+                            }}
+                        />
+                        <input
+                            className='w-full rounded-2xl border border-slate-900/10 bg-white/90 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900/30 focus:bg-white focus:ring-2 focus:ring-amber-200'
+                            placeholder='Filter by category'
+                            value={category}
+                            onChange={(e) => {
+                                setPage(1);
+                                setCategory(e.target.value);
+                            }}
+                        />
+                        <input
+                            className='w-full rounded-2xl border border-slate-900/10 bg-white/90 px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-slate-900/30 focus:bg-white focus:ring-2 focus:ring-amber-200'
+                            placeholder='Filter by tag'
+                            value={tag}
+                            onChange={(e) => {
+                                setPage(1);
+                                setTag(e.target.value);
+                            }}
+                        />
+                    </div>
+                </div>
             </div>
             <div className='grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'>
                 {posts.map((post, index) => (

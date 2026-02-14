@@ -63,11 +63,11 @@ function Header() {
 
 
   return (
-    <header className='sticky top-0 z-40 border-b border-slate-900/10 bg-white/70 backdrop-blur'>
+    <header className='sticky top-0 z-40 border-b border-slate-900/10 bg-white/50 backdrop-blur-xl'>
       <Container>
         <nav className='py-3 sm:py-4'>
           <div className='flex items-center justify-between gap-3'>
-            <Link to='/' className='inline-flex items-center gap-3'>
+            <Link to='/' className='inline-flex items-center gap-2.5 rounded-full px-1 py-1 sm:gap-3'>
               <Logo width='58px' />
               <span className='text-base font-semibold tracking-tight text-slate-900 sm:text-lg'>MegaBlog</span>
             </Link>
@@ -89,11 +89,15 @@ function Header() {
                 aria-label={menuOpen ? 'Close menu' : 'Open menu'}
                 aria-expanded={menuOpen}
               >
-                <span className='text-lg leading-none'>{menuOpen ? 'X' : '='}</span>
+                <span className='relative block h-3.5 w-4'>
+                  <span className={`absolute left-0 top-0 block h-0.5 w-4 bg-slate-700 transition ${menuOpen ? 'translate-y-[6px] rotate-45' : ''}`} />
+                  <span className={`absolute left-0 top-[6px] block h-0.5 w-4 bg-slate-700 transition ${menuOpen ? 'opacity-0' : ''}`} />
+                  <span className={`absolute left-0 top-3 block h-0.5 w-4 bg-slate-700 transition ${menuOpen ? '-translate-y-[6px] -rotate-45' : ''}`} />
+                </span>
               </button>
             </div>
           </div>
-          <ul className={`${menuOpen ? 'mt-3 grid' : 'hidden'} gap-2 sm:mt-4 sm:flex sm:flex-wrap sm:items-center sm:justify-end`}>
+          <ul className={`${menuOpen ? 'surface-glass mt-3 grid rounded-2xl p-3' : 'hidden'} gap-2 sm:mt-4 sm:flex sm:flex-wrap sm:items-center sm:justify-end sm:rounded-none sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none`}>
             {navItems.map((item) =>
               item.active ? (
                 <li key={item.name}>

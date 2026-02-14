@@ -14,7 +14,10 @@
 
 body {
   font-family: 'Space Grotesk', sans-serif;
-  background: #f7f4ef;
+  background:
+    radial-gradient(circle at 0% 10%, rgb(251 191 36 / 0.12), transparent 35%),
+    radial-gradient(circle at 100% 0%, rgb(14 116 144 / 0.12), transparent 34%),
+    #f7f4ef;
   color: #0f172a;
 }
 
@@ -27,6 +30,60 @@ body {
 .dark .app-atmosphere {
   opacity: 0.55;
   filter: hue-rotate(40deg) saturate(0.7);
+}
+
+.surface-glass {
+  border: 1px solid rgb(15 23 42 / 0.09);
+  background: rgb(255 255 255 / 0.72);
+  box-shadow: 0 14px 30px rgb(15 23 42 / 0.08);
+  backdrop-filter: blur(10px);
+}
+
+.mesh-accent {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.75;
+  background:
+    radial-gradient(circle at 18% 20%, rgb(251 191 36 / 0.2), transparent 30%),
+    radial-gradient(circle at 86% 20%, rgb(20 184 166 / 0.16), transparent 28%),
+    radial-gradient(circle at 70% 88%, rgb(249 115 22 / 0.14), transparent 26%);
+}
+
+.pill-tag {
+  border-radius: 999px;
+  border: 1px solid rgb(15 23 42 / 0.1);
+  background: rgb(255 255 255 / 0.8);
+  padding: 0.34rem 0.7rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgb(51 65 85);
+}
+
+.section-kicker {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgb(100 116 139);
+}
+
+.dark .surface-glass {
+  border-color: rgb(148 163 184 / 0.25);
+  background: rgb(15 23 42 / 0.66);
+  box-shadow: 0 20px 38px rgb(2 6 23 / 0.38);
+}
+
+.dark .mesh-accent {
+  opacity: 0.5;
+  filter: saturate(0.7);
+}
+
+.dark .pill-tag {
+  border-color: rgb(148 163 184 / 0.35);
+  background: rgb(30 41 59 / 0.8);
+  color: rgb(226 232 240);
 }
 
 .brand-logo {

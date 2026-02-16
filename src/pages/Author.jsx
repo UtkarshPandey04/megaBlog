@@ -47,10 +47,10 @@ export default function Author() {
               </div>
             </div>
             <p className="mt-4 text-sm text-slate-700">
-              {author.description || "This author has not added a short bio yet."}
+              {author.description || "This author has not added a bio yet."}
             </p>
             <p className="mt-3 text-sm text-slate-600">
-              Explore posts, open any post to like and comment, then continue publishing your own stories.
+              Explore posts, open any post to check the ideas , Do like and comment, then continue publishing your own stories.
             </p>
             <div className="mt-5 flex flex-col gap-3 sm:flex-row">
               <Link
